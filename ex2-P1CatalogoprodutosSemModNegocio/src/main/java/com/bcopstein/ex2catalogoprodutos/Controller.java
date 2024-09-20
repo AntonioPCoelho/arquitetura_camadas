@@ -35,37 +35,14 @@ public class Controller {
     @CrossOrigin(origins = "*")
     public double venda(@PathVariable(value = "codigo") int codigo,
                         @PathVariable(value = "quantidade") int quantidade) {
-        // Recupera o produto
-        Produto produto = produtoDAO.buscaPorCodig(codigo);
-        // Verifica se o produto existe
-        if (produto == null) {
-            return -1;
-        }
-        // Verifica se tem quantidade suficiente
-        int novaQuantidade = produto.getQtdadeEstoque() - quantidade;
-        if (novaQuantidade <= 0) {
-            return -1;
-        }
-        // Atualiza a quantidade no estoque
-        produtoDAO.atualizaQuantidade(codigo, novaQuantidade);
-        // Calcula o valor da venda
-        double valor = logicaVenda.calculaCusto(produto, quantidade);
-        return valor;
+        return logicaVenda.retornaValorVenda(codigo, quantidade);
     }
 
     @GetMapping("entradaNoEstoque/codigo/{codigo}/quantidade/{quantidade}")
     @CrossOrigin(origins = "*")
     public void entradaNoEstoque(@PathVariable(value = "codigo") int codigo,
                                  @PathVariable(value = "quantidade") int quantidade) {
-        // Recupera o produto
-        Produto produto = produtoDAO.buscaPorCodig(codigo);
-        // Verifica se o produto existe
-        if (produto == null) {
-            return;
-        }
-        // Calcula a nova quantidade e atualiza o estoque
-        int novaQuantidade = produto.getQtdadeEstoque() + quantidade;
-        produtoDAO.atualizaQuantidade(codigo, novaQuantidade);
+        logicaVenda.atualizaEstoque(codigo, quantidade);
     }
 
     @GetMapping("comprasNecessarias")
