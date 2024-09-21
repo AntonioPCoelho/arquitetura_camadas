@@ -6,17 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class Controller {
-    private ProdutoDAO produtoDAO;
-    private LogicaVenda logicaVenda;
+    private ProdutoServico produtoServico;
 
     @Autowired
-    public Controller(ProdutoDAO produtoDAO, LogicaVenda logicaVenda) {
-        this.produtoDAO = produtoDAO;
-        this.logicaVenda = logicaVenda;
+    public Controller(ProdutoServico produtoServico) {
+        this.produtoServico = produtoServico;
     }
 
     @GetMapping("")
@@ -28,49 +27,26 @@ public class Controller {
     @GetMapping("produtosDisponiveis")
     @CrossOrigin(origins = "*")
     public List<Produto> produtosDisponiveis() {
-        return produtoDAO.getProdutosDisponiveis();
+        return produtoServico.disponivel();
     }
 
-    @GetMapping("venda/codigo/{codigo}/quantidade/{quantidade}")
+    @PostMapping("venda/codigo/{codigo}/quantidade/{quantidade}")
     @CrossOrigin(origins = "*")
-    public double venda(@PathVariable(value = "codigo") int codigo,
+    public double venda(@PathVariable(value = "codigo") int codigo, 
                         @PathVariable(value = "quantidade") int quantidade) {
-        // Recupera o produto
-        Produto produto = produtoDAO.buscaPorCodig(codigo);
-        // Verifica se o produto existe
-        if (produto == null) {
-            return -1;
-        }
-        // Verifica se tem quantidade suficiente
-        int novaQuantidade = produto.getQtdadeEstoque() - quantidade;
-        if (novaQuantidade <= 0) {
-            return -1;
-        }
-        // Atualiza a quantidade no estoque
-        produtoDAO.atualizaQuantidade(codigo, novaQuantidade);
-        // Calcula o valor da venda
-        double valor = logicaVenda.calculaCusto(produto, quantidade);
-        return valor;
+        return produtoServico.venda(codigo, quantidade);
     }
 
-    @GetMapping("entradaNoEstoque/codigo/{codigo}/quantidade/{quantidade}")
+    @PostMapping("entradaNoEstoque/codigo/{codigo}/quantidade/{quantidade}")
     @CrossOrigin(origins = "*")
     public void entradaNoEstoque(@PathVariable(value = "codigo") int codigo,
                                  @PathVariable(value = "quantidade") int quantidade) {
-        // Recupera o produto
-        Produto produto = produtoDAO.buscaPorCodig(codigo);
-        // Verifica se o produto existe
-        if (produto == null) {
-            return;
-        }
-        // Calcula a nova quantidade e atualiza o estoque
-        int novaQuantidade = produto.getQtdadeEstoque() + quantidade;
-        produtoDAO.atualizaQuantidade(codigo, novaQuantidade);
+        produtoServico.entradaEstoque(codigo, quantidade);
     }
 
     @GetMapping("comprasNecessarias")
     @CrossOrigin(origins = "*")
     public List<Produto> comprasNecessarias() {
-        return produtoDAO.comprasNecessarias();
+        return produtoServico.necessario();
     }
 }
