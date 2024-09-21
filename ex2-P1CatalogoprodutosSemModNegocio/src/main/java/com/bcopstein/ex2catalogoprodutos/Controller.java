@@ -30,14 +30,14 @@ public class Controller {
         return produtoServico.disponivel();
     }
 
-    @PostMapping("venda")
+    @PostMapping("venda/codigo/{codigo}/quantidade/{quantidade}")
     @CrossOrigin(origins = "*")
     public double venda(@PathVariable(value = "codigo") int codigo, 
                         @PathVariable(value = "quantidade") int quantidade) {
         return produtoServico.venda(codigo, quantidade);
     }
 
-    @PostMapping("entradaNoEstoque")
+    @PostMapping("entradaNoEstoque/codigo/{codigo}/quantidade/{quantidade}")
     @CrossOrigin(origins = "*")
     public void entradaNoEstoque(@PathVariable(value = "codigo") int codigo,
                                  @PathVariable(value = "quantidade") int quantidade) {
