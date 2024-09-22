@@ -43,7 +43,7 @@ public class ProdutoServico {
         if (prod == null) return;
 
     // Atualiza a quantidade no estoque
-    int novaQtd = prod.getQtdadeEstoque() - quantidade;
+    int novaQtd = prod.getQtdadeEstoque() + quantidade;
     produtoDAO.atualizaQuantidade(codigo, novaQtd);
     }
 
